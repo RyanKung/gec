@@ -52,11 +52,17 @@ class Monoid(SemiGroup, metaclass=ABCMeta):
 class Group(Monoid, metaclass=ABCMeta):
 
     @abstractmethod
-    def inverse(self, g: 'Group') -> 'Group':
+    def addop_inverse(self, g: 'Group') -> 'Group':
         '''
         Implement for axiom `inverse`
         '''
         pass
+
+    def __sub__(self, g: 'Group') -> 'Group':
+        return self.__add__(self.addop_inverse(g))
+
+    def __neg__(self, g: 'Group') -> 'Group':
+        return self.addop_inverse(g)
 
 
 class Field(Group, metaclass=ABCMeta):
@@ -65,6 +71,13 @@ class Field(Group, metaclass=ABCMeta):
     def mulop(self, g: 'Group') -> 'Group':
         '''
         The Operator for obeying axiom `associativity` (2)
+        '''
+        pass
+
+    @abstractmethod
+    def mulop_inverse(self, g: 'Group') -> 'Group':
+        '''
+        Implement for axiom `inverse`
         '''
         pass
 
@@ -77,3 +90,6 @@ class Field(Group, metaclass=ABCMeta):
         res = self.mulop(g)
         assert isinstance(res, type(self))
         return res
+
+    def __div__(self, g: 'Group') -> 'Group':
+        return self.__add__(self.mul_inverse(g))

@@ -1,8 +1,41 @@
 from abc import abstractproperty
-from .group import Field
+from .group import Field, Group
 
 
-class ECField(Field):
+class FiniteField(Field):
+    P = abstractproperty()
+
+    def _eulidean_alg(self, g, n):
+        '''
+        Extended Euclidean Algorithm
+        '''
+        if g == 0:
+            return 0
+        lm, hm = 1, 0
+        low, high = g % n, n
+        while low > 1:
+            r = high // low
+            nm, new = hm - lm * r, high - low * r
+            lm, low, hm, high = nm, new, lm, low
+        return lm % n
+
+    def zero(self):
+        return 0
+
+    def addop_inverse(self):
+        return self.__class__(-self.value)
+
+    def mulop_inverse(self):
+        return self.__class__(self._eulidean_alg(self.value, self.P))
+
+    def mulop(self, n):
+        return self.__class__((self.value * n.value) % self.P)
+
+    def addop(self, n):
+        return self.__class__((self.value + n.value) % self.P)
+
+
+class ECGroup(Group):
 
     # Elliptic curve parameters (secp256k1)
     # The prime pp that specifies the size of the finite field.
@@ -82,11 +115,15 @@ class ECField(Field):
         if (n % 2) == 1:
             return self._jacobian_add(self._jacobian_double(self._jacobian_multiply(a, n // 2)), a)
 
+    @property
     def zero(self):
-        return (0, 0)
+        return self.__class__((0, 0))
 
-    def inverse(self, g):
-        return self._eulidean_alg(g, self.P)
+    def addop_inverse(self):
+        return self.__class__((-self.value[0], -self.value[1]))
+
+    def mulop_inverse(self):
+        return self.__class__(self._eulidean_alg(self.value, self.P))
 
     def mulop(self, n):
         return self.__class__(
