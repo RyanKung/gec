@@ -1,38 +1,5 @@
 from abc import abstractproperty
-from .group import Field, Group
-
-
-class FiniteField(Field):
-    P = abstractproperty()
-
-    def _eulidean_alg(self, g, n):
-        '''
-        Extended Euclidean Algorithm
-        '''
-        if g == 0:
-            return 0
-        lm, hm = 1, 0
-        low, high = g % n, n
-        while low > 1:
-            r = high // low
-            nm, new = hm - lm * r, high - low * r
-            lm, low, hm, high = nm, new, lm, low
-        return lm % n
-
-    def zero(self):
-        return 0
-
-    def addop_inverse(self):
-        return self.__class__(-self.value)
-
-    def mulop_inverse(self):
-        return self.__class__(self._eulidean_alg(self.value, self.P))
-
-    def mulop(self, n):
-        return self.__class__((self.value * n.value) % self.P)
-
-    def addop(self, n):
-        return self.__class__((self.value + n.value) % self.P)
+from .group import Group
 
 
 class ECGroup(Group):
@@ -66,17 +33,17 @@ class ECGroup(Group):
 
     def _from_jacobian(self, p):
         z = self._eulidean_alg(p[2], self.P)
-        return ((p[0] * z**2) % self.P, (p[1] * z**3) % self.P)
+        return ((p[0] * z**2), (p[1] * z**3))
 
     def _jacobian_double(self, p):
         if not p[1]:
             return (0, 0, 0)
-        ysq = (p[1] ** 2) % self.P
-        S = (4 * p[0] * ysq) % self.P
-        M = (3 * p[0] ** 2 + self.A * p[2] ** 4) % self.P
-        nx = (M**2 - 2 * S) % self.P
-        ny = (M * (S - nx) - 8 * ysq ** 2) % self.P
-        nz = (2 * p[1] * p[2]) % self.P
+        ysq = (p[1] ** 2)
+        S = (4 * p[0] * ysq)
+        M = (3 * p[0] ** 2 + self.A * p[2] ** 4)
+        nx = (M**2 - 2 * S)
+        ny = (M * (S - nx) - 8 * ysq ** 2)
+        nz = (2 * p[1] * p[2])
         return (nx, ny, nz)
 
     def _jacobian_add(self, p, q):
@@ -84,10 +51,10 @@ class ECGroup(Group):
             return q
         if not q[1]:
             return p
-        U1 = (p[0] * q[2] ** 2) % self.P
-        U2 = (q[0] * p[2] ** 2) % self.P
-        S1 = (p[1] * q[2] ** 3) % self.P
-        S2 = (q[1] * p[2] ** 3) % self.P
+        U1 = (p[0] * q[2] ** 2)
+        U2 = (q[0] * p[2] ** 2)
+        S1 = (p[1] * q[2] ** 3)
+        S2 = (q[1] * p[2] ** 3)
         if U1 == U2:
             if S1 != S2:
                 return (0, 0, 1)
@@ -95,12 +62,12 @@ class ECGroup(Group):
 
         H = U2 - U1
         R = S2 - S1
-        H2 = (H * H) % self.P
-        H3 = (H * H2) % self.P
-        U1H2 = (U1 * H2) % self.P
-        nx = (R ** 2 - H3 - 2 * U1H2) % self.P
-        ny = (R * (U1H2 - nx) - S1 * H3) % self.P
-        nz = (H * p[2] * q[2]) % self.P
+        H2 = (H * H)
+        H3 = (H * H2)
+        U1H2 = (U1 * H2)
+        nx = (R ** 2 - H3 - 2 * U1H2)
+        ny = (R * (U1H2 - nx) - S1 * H3)
+        nz = (H * p[2] * q[2])
         return (nx, ny, nz)
 
     def _jacobian_multiply(self, a, n):

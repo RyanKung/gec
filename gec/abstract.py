@@ -1,22 +1,29 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
+from .algorithm import double_and_add_algorithm
 
 
 class Groupoid(metaclass=ABCMeta):
+
+    __slot__ = ''
+
     def __init__(self, v):
         self.value = v
 
     @abstractmethod
-    def addop(self, g: 'Group') -> 'Group':
+    def op(self, g: 'Group') -> 'Group':
         pass
+
+    def __eq__(self, b) -> bool:
+        return self.value == b.value
 
     def __add__(self, g: 'Group') -> 'Group':
         '''
-        Allowing call associativity operator via A@B
+        Allowing call associativity operator via A + B
         Strict limit arg `g` and ret `res` should be subtype of Group,
         For obeying axiom `closure` (1)
         '''
         assert isinstance(g, type(self))
-        res = self.addop(g)
+        res = self.op(g)
         assert isinstance(res, type(self))
         return res
 
@@ -30,66 +37,87 @@ class Groupoid(metaclass=ABCMeta):
         return str(self.value)
 
 
-class SemiGroup(Groupoid, metaclass=ABCMeta):
+class SemiGroup(Groupoid):
     @abstractmethod
-    def addop(self, g: 'Group') -> 'Group':
+    def op(self, g: 'Group') -> 'Group':
         '''
         The Operator for obeying axiom `associativity` (2)
         '''
         pass
 
 
-class Monoid(SemiGroup, metaclass=ABCMeta):
+class Monoid(SemiGroup):
 
     @abstractproperty
-    def zero(self):
+    def identity(self):
         '''
         The value for obeying axiom `identity` (3)
         '''
         pass
 
+    def __matmul__(self, n):
+        return double_and_add_algorithm(n, self, self.identity)
 
-class Group(Monoid, metaclass=ABCMeta):
+
+class Group(Monoid):
 
     @abstractmethod
-    def addop_inverse(self, g: 'Group') -> 'Group':
+    def inverse(self, g: 'Group') -> 'Group':
         '''
         Implement for axiom `inverse`
         '''
         pass
 
     def __sub__(self, g: 'Group') -> 'Group':
-        return self.__add__(self.addop_inverse(g))
+        '''
+        Allow to reverse op via a - b
+        '''
+        return self.op(g.inverse())
 
-    def __neg__(self, g: 'Group') -> 'Group':
-        return self.addop_inverse(g)
+    def __neg__(self) -> 'Group':
+        return self.inverse()
 
 
-class Field(Group, metaclass=ABCMeta):
+class Field(Group):
 
     @abstractmethod
-    def mulop(self, g: 'Group') -> 'Group':
+    def sec_op(self, g: 'Group') -> 'Group':
         '''
         The Operator for obeying axiom `associativity` (2)
         '''
         pass
 
     @abstractmethod
-    def mulop_inverse(self, g: 'Group') -> 'Group':
+    def sec_inverse(self) -> 'Group':
         '''
         Implement for axiom `inverse`
         '''
         pass
 
+    @abstractmethod
+    def sec_identity(self):
+        pass
+
+    def __invert__(self):
+        return self.sec_inverse()
+
     def __mul__(self, g: 'Group') -> 'Group':
         '''
-        Allowing call associativity operator via A@B
+        Allowing call associativity operator via A * B
         Strict limit arg `g` and ret `res` should be subtype of Group,
         For obeying axiom `closure` (1)
         '''
-        res = self.mulop(g)
-        assert isinstance(res, type(self))
+        res = self.sec_op(g)
+        assert isinstance(res, type(self)), 'result shuould be %s' % type(self)
         return res
 
-    def __div__(self, g: 'Group') -> 'Group':
-        return self.__add__(self.mul_inverse(g))
+    def __truediv__(self, g: 'Group') -> 'Group':
+        return self.sec_op(g.sec_inverse())
+
+
+class AbstractIdentity():
+
+    __slot__ = ''
+
+    def __init__(self):
+        self.value = None
