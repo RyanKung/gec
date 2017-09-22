@@ -36,4 +36,4 @@ def test_ec_over_ff():
     b = SomeEllipicCurveGroup((FiniteField97(87), (FiniteField97(27))))
     res = SomeEllipicCurveGroup((FiniteField97(74), (FiniteField97(41))))
     assert (a + b) == res
-    assert a @ 2 == a + a
+    assert a @ 7 == a + a + a + a + a + a + a
