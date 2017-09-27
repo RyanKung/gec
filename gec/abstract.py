@@ -56,7 +56,8 @@ class Monoid(SemiGroup):
         pass
 
     def __matmul__(self, n):
-        return double_and_add_algorithm(n, self, self.identity)
+        return double_and_add_algorithm(
+            getattr(n, 'value', n), self, self.identity)
 
 
 class Group(Monoid):
@@ -113,11 +114,3 @@ class Field(Group):
 
     def __truediv__(self, g: 'Group') -> 'Group':
         return self.sec_op(g.sec_inverse())
-
-
-class AbstractIdentity():
-
-    __slot__ = ''
-
-    def __init__(self):
-        self.value = None

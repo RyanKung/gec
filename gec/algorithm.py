@@ -1,4 +1,8 @@
 from typing import Tuple
+from pyschoof.elliptic_curves.naive import EllipticCurve
+from pyschoof.fields.finite.naive import FiniteField
+from pyschoof.reduced_computation_schoof import frobenius_trace
+
 
 __all__ = ['extended_euclidean_algorithm', 'double_and_add_algorithm']
 
@@ -48,3 +52,7 @@ def double_and_add_algorithm(n, x, init):
         addend = addend + addend
 
     return result
+
+
+def schoof_algorithm(p, a, b):
+    return p + 1 - frobenius_trace(EllipticCurve(FiniteField(p), a, b))
