@@ -8,6 +8,7 @@ class SomeFiniteField(FiniteField):
 def test_finite_field():
     a = SomeFiniteField(2)
     b = SomeFiniteField(3)
+
     assert (a + b) == SomeFiniteField(5)
     assert (a * b) == SomeFiniteField(6)
     assert (a - b) == SomeFiniteField(18)

@@ -17,7 +17,7 @@ class FiniteField97(FiniteField):
 
 
 class EllipticCurveCyclicSubgroup36(CyclicGroup):
-    P = EllipticCurveGroupN710((FiniteField97(3), FiniteField97(6)))
+    G = EllipticCurveGroupN710((FiniteField97(3), FiniteField97(6)))
     N = 5
 
 
@@ -53,6 +53,7 @@ def test_cyclic_subgroup():
     a = EllipticCurveCyclicSubgroup36(1)
     b = EllipticCurveCyclicSubgroup36(2)
     assert a + b == EllipticCurveCyclicSubgroup36(3)
+
     assert EllipticCurveGroup0203(
         (FiniteField97(3), FiniteField97(6))
     ) @ (a + b) == EllipticCurveGroup0203(

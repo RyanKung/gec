@@ -36,13 +36,13 @@ class CyclicGroup(Group):
     the order of a subgroup is a divisor of the order of the parent group
     '''
     # The Base Point
-    P = abstractproperty()
+    G = abstractproperty()
     # Order of subgroup
     N = abstractproperty()
 
     def op(self, g):
         '''
-        2 + 3 -> 2P + 3P -> 5P
+        2 + 3 -> 2G + 3G -> 5G
         '''
         if g.value == 0:
             return self

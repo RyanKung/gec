@@ -4,7 +4,7 @@ from .algorithm import double_and_add_algorithm
 
 class Groupoid(metaclass=ABCMeta):
 
-    __slot__ = ''
+    __slots__ = ()
 
     def __init__(self, v):
         self.value = v
@@ -38,6 +38,9 @@ class Groupoid(metaclass=ABCMeta):
 
 
 class SemiGroup(Groupoid):
+
+    __slots__ = ()
+
     @abstractmethod
     def op(self, g: 'Group') -> 'Group':
         '''
@@ -47,6 +50,7 @@ class SemiGroup(Groupoid):
 
 
 class Monoid(SemiGroup):
+    __slots__ = ()
 
     @abstractproperty
     def identity(self):
@@ -61,6 +65,7 @@ class Monoid(SemiGroup):
 
 
 class Group(Monoid):
+    __slots__ = ()
 
     @abstractmethod
     def inverse(self, g: 'Group') -> 'Group':
@@ -80,6 +85,7 @@ class Group(Monoid):
 
 
 class Field(Group):
+    __slots__ = ()
 
     @abstractmethod
     def sec_op(self, g: 'Group') -> 'Group':
