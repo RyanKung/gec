@@ -7,6 +7,12 @@ class EllipticCurveGroup(Group):
     A = abstractproperty()
     B = abstractproperty()
 
+    def fmap(self, v):
+        if isinstance(v, JacobianGroup):
+            z = ~(v.value[2])
+            return (v.value[0] * z ** 2, v.value[1] * z ** 3)
+        return v
+
     def op(self, g):
         if g.value == 0:
             return self
@@ -62,11 +68,11 @@ class JacobianGroup(Group):
     A = abstractproperty()
     B = abstractproperty()
 
-    def to_ecg(self, n=None):
-        if not n:
-            n = self
-        z = ~(n.value[2])
-        return (n.value[0] * z ** 2), n[1] * z ** 3
+    def fmap(self, v):
+        if isinstance(v, EllipticCurveGroup):
+            field = v.value[0].__class__
+            return [v.value[0], v.value[1], field(1)]
+        return v
 
     def double(self, n=None):
         if not n:

@@ -1,6 +1,6 @@
 from gec.fields import FiniteField
 from gec.groups import JacobianGroup, EllipticCurveGroup, CyclicGroup
-from bitcoin import jacobian_add, jacobian_double, jacobian_multiply
+from bitcoin import jacobian_add, jacobian_double, jacobian_multiply, from_jacobian
 
 A = 0
 B = 7
@@ -72,16 +72,15 @@ def test_jacobian_add():
 
 
 def test_jacobian_multi():
-    jg = JacobianGroupBTC(
+    ret = JacobianGroupBTC(
         (
             FiniteFieldBTC(5),
             FiniteFieldBTC(8),
             FiniteFieldBTC(1)
         )
-    )
+    ) @ EllipticCurveCyclicSubgroupBTC(2)
 
     ans = jacobian_multiply((5, 8, 1), 2)
-    ret = jg @ EllipticCurveCyclicSubgroupBTC(2)
     assert (
         ret.value[0].value,
         ret.value[1].value,
@@ -89,9 +88,19 @@ def test_jacobian_multi():
     ) == ans
 
     ans = jacobian_multiply((5, 8, 1), 3)
-    ret = jg @ EllipticCurveCyclicSubgroupBTC(3)
+    ret = JacobianGroupBTC(EllipticCurveGroupBTC(
+        (
+            FiniteFieldBTC(5),
+            FiniteFieldBTC(8),
+        )
+    )) @ EllipticCurveCyclicSubgroupBTC(3)
     assert (
         ret.value[0].value,
         ret.value[1].value,
         ret.value[2].value
     ) == ans
+    ret = EllipticCurveGroupBTC(ret)
+    assert (
+        ret.value[0].value,
+        ret.value[1].value,
+    ) == from_jacobian(ans)

@@ -2,12 +2,20 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 from .algorithm import double_and_add_algorithm
 
 
-class Groupoid(metaclass=ABCMeta):
+class Functor(metaclass=ABCMeta):
 
     __slots__ = ()
 
     def __init__(self, v):
-        self.value = v
+        self.value = self.fmap(v)
+
+    def fmap(self, o):
+        return o
+
+
+class Groupoid(Functor):
+
+    __slots__ = ()
 
     @abstractmethod
     def op(self, g: 'Group') -> 'Group':
