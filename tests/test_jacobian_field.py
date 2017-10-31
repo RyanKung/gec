@@ -79,6 +79,7 @@ def test_jacobian_multi():
             FiniteFieldBTC(1)
         )
     )
+
     ans = jacobian_multiply((5, 8, 1), 2)
     ret = jg @ EllipticCurveCyclicSubgroupBTC(2)
     assert (

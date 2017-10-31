@@ -10,6 +10,8 @@ class EllipticCurveGroup(Group):
     def op(self, g):
         if g.value == 0:
             return self
+        if self.value == 0:
+            return g
         field = self.value[0].__class__
 
         if self.value[0] != g.value[0]:
