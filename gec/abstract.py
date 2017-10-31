@@ -16,6 +16,18 @@ class Groupoid(metaclass=ABCMeta):
     def __eq__(self, b) -> bool:
         return self.value == b.value
 
+    def __lt__(self, b) -> bool:
+        return self.value < b.value
+
+    def __le__(self, b) -> bool:
+        return self.value <= b.value
+
+    def __gt__(self, b) -> bool:
+        return self.value > b.value
+
+    def __ge__(self, b) -> bool:
+        return self.value >= b.value
+
     def __add__(self, g: 'Group') -> 'Group':
         '''
         Allowing call associativity operator via A + B
@@ -62,9 +74,9 @@ class Monoid(SemiGroup):
     def __not__(self):
         return self is not self.identity
 
-    def __matmul__(self, n):
+    def __matmul__(self, times):
         return double_and_add_algorithm(
-            getattr(n, 'value', n), self, self.identity)
+            getattr(times, 'value', times), self, self.identity)
 
 
 class Group(Monoid):

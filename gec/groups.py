@@ -58,7 +58,7 @@ class CyclicGroup(Group):
 
 class JacobianGroup(Group):
     A = abstractproperty()
-    N = abstractproperty()
+    B = abstractproperty()
 
     def to_ecg(self, n=None):
         if not n:
@@ -89,18 +89,17 @@ class JacobianGroup(Group):
 
     @property
     def identity(self):
-        field = self.value[0].__class__
-        return self.__class__((field(0), field(0), field(0)))
+        return self.__class__(0)
 
     def inverse(self):
         pass
 
     def op(self, g):
         field = self.value[0].__class__
-        if not self.value[1]:
-            return g
-        if not g.value[1]:
+        if not g.value:
             return self
+        if not self.value:
+            return g
         U1 = self.value[0] * g.value[2] ** 2
         U2 = g.value[0] * self.value[2] ** 2
         S1 = self.value[1] * g.value[2] ** 3
@@ -125,18 +124,3 @@ class JacobianGroup(Group):
         ny = R * (U1H2 - nx) - S1 * H3
         nz = H * self.value[2] * g.value[2]
         return self.__class__((nx, ny, nz))
-
-    def __matmul__(self, n):
-        field = self.value[0].__class__
-        if self.value[1].value == 0 or n == 0:
-            return self.__class__(
-                (field(0), field(0), field(1))
-            )
-        if n == 1:
-            return self
-        if n < 0 or n >= self.N:
-            return self @ (n % self.N)
-        if (n % 2) == 0:
-            return self.double(self @ (n // 2))
-        if (n % 2) == 1:
-            return self.double(self @ (n // 2)) + self

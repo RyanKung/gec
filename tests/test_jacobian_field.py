@@ -1,11 +1,13 @@
 from gec.fields import FiniteField
-from gec.groups import JacobianGroup
+from gec.groups import JacobianGroup, EllipticCurveGroup, CyclicGroup
 from bitcoin import jacobian_add, jacobian_double, jacobian_multiply
 
 A = 0
 B = 7
 P = 2**256 - 2**32 - 977
 N = 115792089237316195423570985008687907852837564279074904382605163141518161494337
+Gx = 0X79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798
+Gy = 0X483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8
 
 
 class FiniteFieldBTC(FiniteField):
@@ -13,8 +15,18 @@ class FiniteFieldBTC(FiniteField):
 
 
 class JacobianGroupBTC(JacobianGroup):
-    N = N
     A = A
+    B = 7
+
+
+class EllipticCurveGroupBTC(EllipticCurveGroup):
+    A = 0
+    B = 7
+
+
+class EllipticCurveCyclicSubgroupBTC(CyclicGroup):
+    G = EllipticCurveGroupBTC((FiniteFieldBTC(Gx), FiniteFieldBTC(Gy)))
+    N = N
 
 
 def test_jacobian_double():
@@ -68,7 +80,7 @@ def test_jacobian_multi():
         )
     )
     ans = jacobian_multiply((5, 8, 1), 2)
-    ret = jg @ 2
+    ret = jg @ EllipticCurveCyclicSubgroupBTC(2)
     assert (
         ret.value[0].value,
         ret.value[1].value,
@@ -76,7 +88,7 @@ def test_jacobian_multi():
     ) == ans
 
     ans = jacobian_multiply((5, 8, 1), 3)
-    ret = jg @ 3
+    ret = jg @ EllipticCurveCyclicSubgroupBTC(3)
     assert (
         ret.value[0].value,
         ret.value[1].value,

@@ -28,7 +28,7 @@ def extended_euclidean_algorithm(a: int, b: int) -> Tuple[int, int, int]:
     return old_r, old_s, old_t
 
 
-def double_and_add_algorithm(n, x, init):
+def double_and_add_algorithm(times, x, init):
     """
     Returns the result of n * x, computed using
     the double and add algorithm.
@@ -42,11 +42,10 @@ def double_and_add_algorithm(n, x, init):
         while n:
             yield n & 1
             n >>= 1
-
     result = init
     addend = x
 
-    for bit in bits(n):
+    for bit in bits(times):
         if bit == 1:
             result = addend + result
         addend = addend + addend
