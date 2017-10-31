@@ -88,12 +88,14 @@ def test_jacobian_multi():
     ) == ans
 
     ans = jacobian_multiply((5, 8, 1), 3)
-    ret = JacobianGroupBTC(EllipticCurveGroupBTC(
-        (
-            FiniteFieldBTC(5),
-            FiniteFieldBTC(8),
+    ret = JacobianGroupBTC(
+        EllipticCurveGroupBTC(
+            (
+                FiniteFieldBTC(5),
+                FiniteFieldBTC(8),
+            )
         )
-    )) @ EllipticCurveCyclicSubgroupBTC(3)
+    ) @ EllipticCurveCyclicSubgroupBTC(3)
     assert (
         ret.value[0].value,
         ret.value[1].value,
